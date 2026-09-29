@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FraudGuard AI – Banking Fraud Analytics System</title>
+  <meta name="description" content="AI-Powered Banking & Fraud Transaction Analytics System with real-time scoring, ML models, and natural language query interface." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L3 7v5c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7L12 2z" fill="url(#brandGrad)"/>
+        <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+          <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">FraudGuard</span>
+      <span class="brand-sub">AI Analytics</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" id="nav-upload" onclick="switchTab('upload')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload Data
+    </button>
+    <button class="nav-item" id="nav-explorer" onclick="switchTab('explorer')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      Transaction Explorer
+    </button>
+    <button class="nav-item" id="nav-analytics" onclick="switchTab('analytics')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Analytics
+    </button>
+    <button class="nav-item" id="nav-chat" onclick="switchTab('chat')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI Assistant
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="api-status" id="apiStatus">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Connecting…</span>
+    </div>
+    <div class="refresh-info" id="refreshInfo" style="font-size:10px;color:#475569;margin-top:4px;padding-left:4px;">Auto-refresh: 30s</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title" id="pageTitle">Upload Transaction Data</h1>
+      <div class="breadcrumb" id="pageBreadcrumb">Upload your CSV to score and analyze with the ML fraud engine</div>
+    </div>
+    <div class="topbar-right">
+      <div class="data-source-badge" id="dataSourceBadge">
+        <span id="dataSourceText">🔗 Live DB</span>
+      </div>
+      <button class="btn-config" onclick="showConfig()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M12 20v2M19.07 19.07l-1.41-1.41M22 12h-2"/></svg>
+        Config
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI METRICS STRIP -->
+  <section class="kpi-strip" id="kpiStrip">
+    <div class="kpi-card" id="kpi-total">
+      <div class="kpi-icon kpi-icon--blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="kpi-total-value">—</div>
+        <div class="kpi-label">Total Transactions</div>
+      </div>
+    </div>
+    <div class="kpi-card" id="kpi-fraud">
+      <div class="kpi-icon kpi-icon--red">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="kpi-fraud-value">—</div>
+        <div class="kpi-label">Fraud Rate</div>
+      </div>
+    </div>
+    <div class="kpi-card" id="kpi-amount">
+      <div class="kpi-icon kpi-icon--orange">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="kpi-amount-value">—</div>
+        <div class="kpi-label">Fraud Losses</div>
+      </div>
+    </div>
+    <div class="kpi-card" id="kpi-highrisk">
+      <div class="kpi-icon kpi-icon--purple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="kpi-highrisk-value">—</div>
+        <div class="kpi-label">High-Risk Alerts</div>
+      </div>
+    </div>
+    <div class="kpi-card" id="kpi-lastupdated">
+      <div class="kpi-icon kpi-icon--teal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="kpi-lastupdate-value" style="font-size:14px">—</div>
+        <div class="kpi-label">Last DB Refresh</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TAB PANELS ═══ -->
+
+  <!-- UPLOAD DATA TAB -->
+  <section class="tab-panel active" id="tab-upload">
+    <div class="info-banner">
+      <div class="info-banner-icon">📂</div>
+      <div class="info-banner-text">
+        <strong>Upload your own transaction CSV</strong> — The system will automatically parse, score each transaction
+        through the ML fraud detection engine, and display results in the Explorer tab.
+        Required columns: <code>account_id, amount, merchant_category, channel, location_lat, location_long</code>.
+      </div>
+    </div>
+
+    <div class="upload-layout">
+      <!-- Upload card -->
+      <div class="glass-card upload-card">
+        <div class="card-header">
+          <h2 class="card-title">📤 Upload Transaction Data (CSV)</h2>
+        </div>
+        <div class="upload-body">
+          <!-- Drop Zone -->
+          <div class="drop-zone" id="dropZone"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)">
+            <div class="drop-icon">🗂️</div>
+            <p class="drop-title">Drag & drop your CSV here</p>
+            <p class="drop-sub">or click to browse files</p>
+            <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileSelect(event)" style="display:none"/>
+            <button class="btn-primary" style="margin-top:12px" onclick="document.getElementById('csvFileInput').click()">
+              Browse File
+            </button>
+          </div>
+
+          <!-- File info -->
+          <div class="file-info" id="fileInfo" style="display:none">
+            <div class="file-info-row">
+              <span class="file-icon">📄</span>
+              <div>
+                <div class="file-name" id="fileName">—</div>
+                <div class="file-meta" id="fileMeta">—</div>
+              </div>
+              <button class="btn-sm" onclick="clearUpload()">✕ Remove</button>
+            </div>
+          </div>
+
+          <!-- Preview table -->
+          <div id="previewSection" style="display:none">
+            <div class="preview-header">
+              <h3 class="preview-title">Data Preview (first 5 rows)</h3>
+              <div class="validation-badge" id="validationBadge"></div>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table" id="previewTable">
+                <thead id="previewHead"></thead>
+                <tbody id="previewBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Column mapping if needed -->
+            <div id="missingCols" style="display:none" class="missing-cols-warning"></div>
+
+            <div class="upload-actions">
+              <div class="upload-options">
+                <label class="option-label">
+                  <input type="checkbox" id="optScoreAll" checked />
+                  Score all rows with ML model
+                </label>
+                <label class="option-label">
+                  <input type="checkbox" id="optAddToDb" checked />
+                  Add to database (visible in Explorer)
+                </label>
+              </div>
+              <button class="btn-primary btn-submit" id="uploadSubmitBtn" onclick="submitUpload()">
+                🚀 Process &amp; Score All Transactions
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Results -->
+      <div class="glass-card upload-result-card" id="uploadResultCard" style="display:none">
+        <div class="card-header">
+          <h2 class="card-title">📊 Processing Results</h2>
+        </div>
+        <div class="upload-result-body" id="uploadResultBody"></div>
+      </div>
+
+      <!-- Format Guide -->
+      <div class="glass-card format-guide-card">
+        <div class="card-header">
+          <h2 class="card-title">📋 Required CSV Format</h2>
+        </div>
+        <div style="padding:16px">
+          <p style="font-size:12px;color:#94a3b8;margin-bottom:12px">Your CSV must contain these columns (optional columns are auto-filled):</p>
+          <table class="data-table">
+            <thead><tr><th>Column</th><th>Type</th><th>Required</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">account_id</td><td>text</td><td><span style="color:#22c55e">✔ Yes</span></td><td>ACC-123XYZ</td></tr>
+              <tr><td class="mono">amount</td><td>number</td><td><span style="color:#22c55e">✔ Yes</span></td><td>2499.99</td></tr>
+              <tr><td class="mono">merchant_category</td><td>text</td><td><span style="color:#22c55e">✔ Yes</span></td><td>online_retail</td></tr>
+              <tr><td class="mono">channel</td><td>text</td><td><span style="color:#22c55e">✔ Yes</span></td><td>Online / POS / ATM</td></tr>
+              <tr><td class="mono">location_lat</td><td>decimal</td><td><span style="color:#22c55e">✔ Yes</span></td><td>28.6139</td></tr>
+              <tr><td class="mono">location_long</td><td>decimal</td><td><span style="color:#22c55e">✔ Yes</span></td><td>77.2090</td></tr>
+              <tr><td class="mono">timestamp</td><td>datetime</td><td><span style="color:#f59e0b">Optional</span></td><td>2025-06-15 14:30:00</td></tr>
+              <tr><td class="mono">ip_address</td><td>text</td><td><span style="color:#f59e0b">Optional</span></td><td>192.168.1.1</td></tr>
+              <tr><td class="mono">device_id</td><td>text</td><td><span style="color:#f59e0b">Optional</span></td><td>iPhone15-ABC</td></tr>
+              <tr><td class="mono">is_fraud</td><td>0 or 1</td><td><span style="color:#f59e0b">Optional</span></td><td>0 (unknown=0)</td></tr>
+            </tbody>
+          </table>
+          <button class="btn-sm" style="margin-top:12px" onclick="downloadSampleCSV()">⬇ Download Sample CSV</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLORER TAB -->
+  <section class="tab-panel" id="tab-explorer">
+    <div class="glass-card">
+      <div class="card-header">
+        <h2 class="card-title">Transaction Explorer</h2>
+        <div class="card-actions">
+          <input type="text" class="search-input" id="explorerSearch" placeholder="Search account ID…" oninput="debounceExplorerSearch()" />
+          <select class="select-sm" id="explorerRisk" onchange="loadExplorer()">
+            <option value="">All Tiers</option>
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="HIGH">HIGH</option>
+            <option value="MED">MED</option>
+            <option value="LOW">LOW</option>
+          </select>
+          <button class="btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table" id="explorerTable">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Account</th>
+              <th>Timestamp</th>
+              <th>Amount</th>
+              <th>Category</th>
+              <th>Channel</th>
+              <th>Fraud Prob</th>
+              <th>Risk Tier</th>
+              <th>Fraud?</th>
+            </tr>
+          </thead>
+          <tbody id="explorerBody">
+            <tr><td colspan="9" class="empty-state">Loading transactions…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="explorerPagination">
+        <button class="btn-sm" id="prevPage" onclick="explorerPage(-1)">← Prev</button>
+        <span class="page-info" id="pageInfo">Page 1</span>
+        <button class="btn-sm" id="nextPage" onclick="explorerPage(1)">Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANALYTICS TAB -->
+  <section class="tab-panel" id="tab-analytics">
+    <div class="panel-grid" style="margin-bottom:16px">
+      <!-- Fraud Trend Chart -->
+      <div class="glass-card chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Fraud Trend (Live from DB — Last 30 Days)</h2>
+          <span class="live-tag">↻ Auto-updates</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+      <!-- Detected Fraud Patterns -->
+      <div class="glass-card chart-card">
+        <div class="card-header"><h2 class="card-title">Detected Fraud Patterns</h2></div>
+        <div class="fraud-patterns" id="fraudPatterns">
+          <div class="pattern-item">
+            <span class="pattern-dot" style="background:#f59e0b"></span>
+            <span class="pattern-name">Card Testing</span>
+            <span class="pattern-val" id="pat-card">—</span>
+          </div>
+          <div class="pattern-item">
+            <span class="pattern-dot" style="background:#ef4444"></span>
+            <span class="pattern-name">Impossible Travel</span>
+            <span class="pattern-val" id="pat-travel">—</span>
+          </div>
+          <div class="pattern-item">
+            <span class="pattern-dot" style="background:#8b5cf6"></span>
+            <span class="pattern-name">Nocturnal Anomaly</span>
+            <span class="pattern-val" id="pat-nocturnal">—</span>
+          </div>
+          <div class="pattern-item">
+            <span class="pattern-dot" style="background:#6366f1"></span>
+            <span class="pattern-name">Velocity Spike</span>
+            <span class="pattern-val" id="pat-velocity">—</span>
+          </div>
+          <div class="pattern-item">
+            <span class="pattern-dot" style="background:#14b8a6"></span>
+            <span class="pattern-name">Dormant Reactivation</span>
+            <span class="pattern-val" id="pat-dormant">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-grid" style="margin-bottom:16px">
+      <div class="glass-card chart-card">
+        <div class="card-header"><h2 class="card-title">Risk Distribution</h2></div>
+        <div class="chart-wrapper">
+          <canvas id="riskPieChart"></canvas>
+        </div>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="card-header"><h2 class="card-title">Fraud by Category</h2></div>
+        <div class="chart-wrapper">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="glass-card">
+        <div class="card-header"><h2 class="card-title">Hourly Fraud Heatmap</h2></div>
+        <div class="chart-wrapper"><canvas id="hourlyChart"></canvas></div>
+      </div>
+      <div class="glass-card">
+        <div class="card-header"><h2 class="card-title">Amount Distribution by Risk</h2></div>
+        <div class="chart-wrapper"><canvas id="amountChart"></canvas></div>
+      </div>
+      <div class="glass-card">
+        <div class="card-header"><h2 class="card-title">Top Fraud Channels</h2></div>
+        <div class="chart-wrapper"><canvas id="channelChart"></canvas></div>
+      </div>
+      <div class="glass-card">
+        <div class="card-header"><h2 class="card-title">Model Performance</h2></div>
+        <div class="model-perf" id="modelPerf">
+          <div class="perf-item">
+            <span class="perf-label">XGBoost PR-AUC</span>
+            <div class="perf-bar-wrap"><div class="perf-bar perf-bar--indigo" style="width:100%"></div></div>
+            <span class="perf-val">1.00</span>
+          </div>
+          <div class="perf-item">
+            <span class="perf-label">Hybrid F1 (Fraud)</span>
+            <div class="perf-bar-wrap"><div class="perf-bar perf-bar--green" style="width:97%"></div></div>
+            <span class="perf-val">0.97</span>
+          </div>
+          <div class="perf-item">
+            <span class="perf-label">ROC-AUC</span>
+            <div class="perf-bar-wrap"><div class="perf-bar perf-bar--blue" style="width:100%"></div></div>
+            <span class="perf-val">1.00</span>
+          </div>
+          <div class="perf-item">
+            <span class="perf-label">Isolation Forest F1</span>
+            <div class="perf-bar-wrap"><div class="perf-bar perf-bar--purple" style="width:44%"></div></div>
+            <span class="perf-val">0.44</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI CHAT TAB -->
+  <section class="tab-panel" id="tab-chat">
+
+    <div class="info-banner" style="margin-bottom:12px">
+      <div class="info-banner-icon">🤖</div>
+      <div class="info-banner-text">
+        <strong>AI Assistant supports Hinglish!</strong> Aap Hindi aur English mix karke pooch sakte hain.
+        Example: <em>"Kal kitne fraud transactions hue?"</em> or <em>"Show me top 10 high risk accounts"</em> —
+        both work. Type in the box below and press <strong>Enter</strong> or click ➤ to send.
+      </div>
+      <button class="info-close" onclick="this.parentElement.style.display='none'">✕</button>
+    </div>
+
+    <div class="chat-layout">
+      <div class="glass-card chat-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="ai-badge">🤖 Grok AI</span>
+            Fraud Intelligence Assistant
+          </h2>
+          <div class="card-actions">
+            <button class="btn-sm" onclick="clearChat()">🗑 Clear</button>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg assistant-msg">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              <p>Namaste! 👋 Main aapka <strong>AI Fraud Intelligence Assistant</strong> hoon.</p>
+              <p style="margin-top:8px">Aap mujhse Hindi, English, ya Hinglish mein pooch sakte hain:</p>
+              <ul style="margin-top:6px;padding-left:18px;line-height:1.9">
+                <li>Kitne fraud transactions hue last month?</li>
+                <li>Which merchant category has highest fraud?</li>
+                <li>Top 10 high risk accounts dikhao</li>
+                <li>Show me card testing attacks this week</li>
+              </ul>
+              <p style="margin-top:10px;font-size:12px;color:#6366f1">💡 Neeche box mein type karein aur Enter dabayein ya ➤ button click karein</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-suggestions" id="chatSuggestions">
+          <button class="suggestion-chip" onclick="sendSuggestion('Fraud rate by merchant category dikhao')">Fraud by category</button>
+          <button class="suggestion-chip" onclick="sendSuggestion('Top 10 highest fraud probability transactions')">Top fraud TXNs</button>
+          <button class="suggestion-chip" onclick="sendSuggestion('Kal kitne fraud hue? Daily trend dikhao')">Kal ka trend</button>
+          <button class="suggestion-chip" onclick="sendSuggestion('Impossible travel wale accounts dikhao')">Travel anomalies</button>
+          <button class="suggestion-chip" onclick="sendSuggestion('High risk accounts list karo')">High risk accounts</button>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea
+            class="chat-input"
+            id="chatInput"
+            placeholder="Type karo ya bolo… e.g. 'Kitne fraud hue?' or 'Show top fraud accounts'"
+            rows="1"
+          ></textarea>
+          <button class="chat-send-btn" id="chatSendBtn" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div style="text-align:center;font-size:10px;color:#334155;padding:4px">
+          Press <kbd style="background:#1e293b;padding:2px 6px;border-radius:3px;border:1px solid #334155">Enter</kbd> to send &nbsp;·&nbsp;
+          <kbd style="background:#1e293b;padding:2px 6px;border-radius:3px;border:1px solid #334155">Shift+Enter</kbd> for new line
+        </div>
+      </div>
+
+      <!-- Chat Results Panel -->
+      <div class="glass-card chat-result-panel" id="chatResultPanel">
+        <div class="card-header"><h2 class="card-title">Query Results</h2></div>
+        <div class="result-sql" id="resultSql" style="display:none">
+          <div class="sql-label">Generated SQL</div>
+          <pre class="sql-code" id="sqlCode"></pre>
+        </div>
+        <div class="chart-wrapper" id="resultChartWrapper" style="display:none">
+          <canvas id="nlqChart"></canvas>
+        </div>
+        <div class="table-wrapper" id="resultTableWrapper" style="display:none">
+          <table class="data-table" id="nlqTable">
+            <thead id="nlqTableHead"></thead>
+            <tbody id="nlqTableBody"></tbody>
+          </table>
+        </div>
+        <div class="result-placeholder" id="resultPlaceholder">
+          <div class="placeholder-icon">📊</div>
+          <p>Query results aur charts yahan dikhenge</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- CONFIG MODAL -->
+<div class="modal-overlay" id="configModal" onclick="hideConfig(event)">
+  <div class="modal">
+    <h2 class="modal-title">⚙️ API Configuration</h2>
+    <div class="form-group">
+      <label>API Base URL</label>
+      <input type="text" id="configApiUrl" value="http://localhost:8000" />
+    </div>
+    <div class="form-group">
+      <label>Live Feed Refresh Interval (ms)</label>
+      <input type="number" id="configRefresh" value="5000" min="2000" max="60000" step="1000" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveConfig()">Save & Reconnect</button>
+      <button class="btn-sm" onclick="document.getElementById('configModal').classList.remove('visible')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

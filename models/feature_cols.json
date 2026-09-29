@@ -1,0 +1,1 @@
+["log_amount", "amount_zscore", "amount_round", "hour", "day_of_week", "is_weekend", "is_night", "month", "txn_count_1h", "txn_count_24h", "txn_sum_24h", "seconds_since_last", "geo_velocity_kmh", "merchant_cat_encoded", "merchant_fraud_rate", "channel_encoded", "ip_is_foreign"]

@@ -1,0 +1,16 @@
+merchant_key,merchant_name,total_transactions,total_amount,fraud_transactions,fraud_rate,risk_level
+1,atm_withdrawal,3602,576138.07,10,0.0028,LOW
+2,electronics,3794,568692.41,51,0.0134,LOW
+3,entertainment,3688,551619.18,0,0.0,nan
+4,gambling,53,13381.83,53,1.0,CRITICAL
+5,gas_station,3611,528076.79,0,0.0,nan
+6,grocery,3729,572472.5,0,0.0,nan
+7,healthcare,3791,560160.22,0,0.0,nan
+8,hotel,3742,565407.23,1,0.0003,LOW
+9,luxury_goods,4,10257.36,4,1.0,CRITICAL
+10,online_retail,3797,542672.14,104,0.0274,MEDIUM
+11,peer_transfer,3743,757601.0,27,0.0072,LOW
+12,restaurant,3694,564779.6,0,0.0,nan
+13,subscription,3862,541885.5,71,0.0184,LOW
+14,travel,3624,532106.39,0,0.0,nan
+15,utility,3719,567153.12,0,0.0,nan
