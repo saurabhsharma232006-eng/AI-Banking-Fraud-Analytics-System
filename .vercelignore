@@ -9,11 +9,17 @@ logs/
 __pycache__/
 *.py[cod]
 
-# Large datasets (database is bundled as transactions.db)
+# Large datasets (only transactions.db is used at runtime)
 data/transactions.csv
 data/transactions.parquet
 data/accounts.csv
 data/test_upload_dataset.csv
+
+# Legacy pkl model files (runtime now uses JSON format)
+models/xgb_model.pkl
+models/iso_forest.pkl
+models/le_merchant.pkl
+models/le_channel.pkl
 
 # Dev dependencies
 requirements-dev.txt

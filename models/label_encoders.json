@@ -1,0 +1,1 @@
+{"merchant": {"atm_withdrawal": 0, "electronics": 1, "entertainment": 2, "gambling": 3, "gas_station": 4, "grocery": 5, "healthcare": 6, "hotel": 7, "luxury_goods": 8, "online_retail": 9, "peer_transfer": 10, "restaurant": 11, "subscription": 12, "travel": 13, "utility": 14}, "channel": {"ATM": 0, "Mobile": 1, "Online": 2, "POS": 3}}

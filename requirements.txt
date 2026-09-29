@@ -1,4 +1,4 @@
-# Production Runtime Dependencies (FastAPI, Scorer & NLQ)
+# Production Runtime Dependencies — lean, Vercel-safe (<300 MB)
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 pydantic==2.9.2
@@ -10,12 +10,9 @@ httpx==0.27.2
 sqlalchemy==2.0.35
 aiosqlite==0.20.0
 
-# Data & ML Inference
+# ML Inference (sklearn-free at runtime — XGBoost native JSON)
 numpy==1.26.4
-pandas==2.2.3
-scikit-learn==1.5.2
 xgboost==2.1.1
-joblib==1.4.2
 
 # NLQ Engine
 openai==1.51.0
