@@ -20,6 +20,8 @@ models/xgb_model.pkl
 models/iso_forest.pkl
 models/le_merchant.pkl
 models/le_channel.pkl
+# Intermediate model export (runtime uses xgb_trees_flat.json instead)
+models/xgb_model.json
 
 # Dev dependencies
 requirements-dev.txt
