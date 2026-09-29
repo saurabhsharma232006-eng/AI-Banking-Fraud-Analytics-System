@@ -74,8 +74,9 @@ app.add_middleware(
 )
 
 
-# ── Health ────────────────────────────────────────────────────────────────────
 @app.get("/health", response_model=HealthResponse, tags=["System"])
+@app.get("/api/health", response_model=HealthResponse, tags=["System"])
+@app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
 async def health_check(db: AsyncSession = Depends(get_db)):
     engine = get_engine()
     try:

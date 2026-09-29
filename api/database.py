@@ -16,10 +16,26 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import declarative_base, Session
 from sqlalchemy import create_engine as sync_engine
 
-logger = logging.getLogger(__name__)
+import shutil
+
 Base = declarative_base()
 
-DATABASE_URL       = os.getenv("DATABASE_URL", "sqlite:///./data/transactions.db")
+# Handle Vercel Serverless environment where /var/task is read-only
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    default_db = Path("./data/transactions.db").resolve()
+    if os.getenv("VERCEL"):
+        tmp_db = Path("/tmp/transactions.db")
+        if default_db.exists() and not tmp_db.exists():
+            try:
+                shutil.copy2(default_db, tmp_db)
+                logger.info("Copied database to /tmp/transactions.db for Vercel writable access.")
+            except Exception as e:
+                logger.warning(f"Could not copy db to /tmp: {e}")
+        DATABASE_URL = f"sqlite:///{tmp_db}"
+    else:
+        DATABASE_URL = f"sqlite:///{default_db}"
+
 ASYNC_DATABASE_URL = DATABASE_URL.replace("sqlite:///", "sqlite+aiosqlite:///")
 
 

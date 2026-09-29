@@ -1,0 +1,26 @@
+# Development, Offline Training, Power BI Export, and Testing Dependencies
+-r requirements.txt
+
+# Offline Feature Engineering & Training
+scipy==1.14.1
+lightgbm==4.5.0
+imbalanced-learn==0.12.4
+shap==0.46.0
+
+# NLQ Extended Frameworks
+langchain==0.3.1
+langchain-openai==0.2.1
+langchain-community==0.3.1
+
+# BI & Parquet Export
+pyarrow==17.0.0
+openpyxl==3.1.5
+
+# Test Suite
+pytest==8.3.3
+pytest-asyncio==0.24.0
+
+# CLI & Formatting
+rich==13.9.1
+loguru==0.7.2
+typer==0.12.5

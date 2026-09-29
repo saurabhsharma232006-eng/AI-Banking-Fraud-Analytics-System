@@ -5,8 +5,11 @@
 
 'use strict';
 
-// ── Config ────────────────────────────────────────────────────────────────────
-let API_BASE   = localStorage.getItem('fg_api_base')  || 'http://localhost:8000';
+let API_BASE   = localStorage.getItem('fg_api_base') || (
+  typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '8000' && window.location.port !== ''
+    ? 'http://localhost:8000'
+    : ''
+);
 let REFRESH_MS = parseInt(localStorage.getItem('fg_refresh') || '5000');
 
 let currentTab     = 'upload';
